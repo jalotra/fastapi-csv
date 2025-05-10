@@ -4,11 +4,38 @@ import csv
 import sqlite3
 import json
 import io
-from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
+from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, Request, Security
 from fastapi.responses import JSONResponse
+from fastapi.security.api_key import APIKeyHeader
+from fastapi.middleware.base import BaseHTTPMiddleware
 from typing import List, Optional
 
 app = FastAPI(title="CSV to JSON API")
+
+# API Key configuration
+API_KEY = os.environ.get("API_KEY")
+API_KEY_NAME = "x-api-key"
+
+
+class APIKeyMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Skip API key check for root endpoint (documentation)
+        if request.url.path == "/" or request.url.path.startswith("/docs") or request.url.path.startswith("/openapi"):
+            return await call_next(request)
+        
+        # Get API key from header
+        api_key = request.headers.get(API_KEY_NAME)
+        if api_key is None or api_key != API_KEY:
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "Invalid or missing API key"}
+            )
+        
+        return await call_next(request)
+
+
+# Add the middleware to the application
+app.add_middleware(APIKeyMiddleware)
 
 # SQLite database setup
 DATABASE_NAME = "csv_data.db"

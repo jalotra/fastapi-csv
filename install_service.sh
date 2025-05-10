@@ -27,7 +27,15 @@ deactivate
 # Update the service file with the correct paths
 echo "Configuring service file..."
 sed -i "s|WorkingDirectory=.*|WorkingDirectory=$APP_DIR|g" "$APP_DIR/fastapi-csv.service"
-sed -i "s|ExecStart=.*|ExecStart=$APP_DIR/venv/bin/python -m uvicorn app:app --host 0.0.0.0 --port 8000|g" "$APP_DIR/fastapi-csv.service"
+
+# Verify app.py exists
+if [ ! -f "$APP_DIR/app.py" ]; then
+  echo "Error: app.py not found in $APP_DIR"
+  exit 1
+fi
+
+# Set the ExecStart with absolute path to ensure it finds the correct app.py
+sed -i "s|ExecStart=.*|ExecStart=$APP_DIR/venv/bin/python -m uvicorn $APP_DIR/app:app --host 0.0.0.0 --port 8000|g" "$APP_DIR/fastapi-csv.service"
 
 # Copy service file to systemd directory
 echo "Installing systemd service..."
