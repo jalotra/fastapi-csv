@@ -34,9 +34,6 @@ if [ ! -f "$APP_DIR/app.py" ]; then
   exit 1
 fi
 
-# Set the ExecStart with absolute path to ensure it finds the correct app.py
-sed -i "s|ExecStart=.*|ExecStart=$APP_DIR/venv/bin/python -m uvicorn $APP_DIR/app:app --host 0.0.0.0 --port 8000|g" "$APP_DIR/fastapi-csv.service"
-
 # Copy service file to systemd directory
 echo "Installing systemd service..."
 cp "$APP_DIR/fastapi-csv.service" /etc/systemd/system/

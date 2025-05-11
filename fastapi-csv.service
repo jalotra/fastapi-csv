@@ -5,8 +5,8 @@ After=network.target
 [Service]
 User=www-data
 Group=www-data
-WorkingDirectory=/path/to/fastapi-csv
-ExecStart=/usr/bin/python3 -m uvicorn app:app --host 0.0.0.0 --port 8000
+WorkingDirectory=/home/ubuntu/csv/fastapi-csv
+ExecStart=/home/ubuntu/csv/fastapi-csv/venv/bin/python -m uvicorn app:app --host 0.0.0.0 --port 8000
 Restart=on-failure
 RestartSec=5s
 Environment="PATH=/usr/bin:/usr/local/bin"
