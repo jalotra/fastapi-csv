@@ -15,7 +15,6 @@ Environment="API_KEY=hello"
 
 # Security directives
 ProtectHome=false
-ProtectSystem=strict
 ReadWritePaths=/home/ubuntu/csv/fastapi-csv
 PrivateTmp=true
 NoNewPrivileges=true
