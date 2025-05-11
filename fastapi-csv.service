@@ -10,6 +10,19 @@ ExecStart=/home/ubuntu/csv/fastapi-csv/venv/bin/python -m uvicorn app:app --host
 Restart=on-failure
 RestartSec=5s
 Environment="PATH=/usr/bin:/usr/local/bin"
+# Add API key environment variable (replace 'your-secure-api-key' with actual key)
+Environment="API_KEY=hello"
+
+# Security directives
+ProtectSystem=strict
+ReadWritePaths=/home/ubuntu/csv/fastapi-csv
+PrivateTmp=true
+NoNewPrivileges=true
+
+# Resource limits
+LimitNOFILE=4096
+CPUQuota=90%
+MemoryLimit=512M
 
 [Install]
 WantedBy=multi-user.target
