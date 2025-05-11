@@ -6,7 +6,8 @@ import json
 import io
 from fastapi import FastAPI, UploadFile, File, HTTPException, Request
 from fastapi.responses import JSONResponse
-from fastapi.middleware.base import BaseHTTPMiddleware
+
+
 
 app = FastAPI(title="CSV to JSON API")
 
