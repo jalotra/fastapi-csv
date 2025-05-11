@@ -10,8 +10,10 @@ ExecStart=/home/ubuntu/csv/fastapi-csv/venv/bin/python -m uvicorn app:app --host
 Restart=on-failure
 RestartSec=5s
 Environment="PATH=/usr/bin:/usr/local/bin"
-# Add API key environment variable (replace 'your-secure-api-key' with actual key)
+# Add API key environment variable
 Environment="API_KEY=hello"
+# Database path environment variable
+Environment="DATABASE_PATH=/home/ubuntu/csv/fastapi-csv/data"
 
 # Security directives
 ProtectHome=false

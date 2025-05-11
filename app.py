@@ -34,13 +34,24 @@ async def api_key_middleware(request: Request, call_next):
 
 
 # SQLite database setup
-DATABASE_NAME = "csv_data.db"
+# Use an absolute path in a directory where www-data has write permissions
+DATABASE_PATH = os.environ.get("DATABASE_PATH", "/home/ubuntu/csv/fastapi-csv/data")
+os.makedirs(DATABASE_PATH, exist_ok=True)
+DATABASE_NAME = os.path.join(DATABASE_PATH, "csv_data.db")
 
 
 def get_db_connection():
     """Create a connection to the SQLite database"""
+    # Ensure the database directory exists and has correct permissions
+    os.makedirs(os.path.dirname(DATABASE_NAME), exist_ok=True)
+    
+    # Connect with write permissions
     conn = sqlite3.connect(DATABASE_NAME)
     conn.row_factory = sqlite3.Row  # This enables column access by name
+    
+    # Execute pragma for better concurrency
+    conn.execute("PRAGMA journal_mode=WAL")
+    
     return conn
 
 
