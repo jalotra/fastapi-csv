@@ -72,6 +72,15 @@ def init_db():
         FOREIGN KEY (file_id) REFERENCES csv_files (id)
     )
     """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS counter (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        count INTEGER NOT NULL, 
+        file_id TEXT NOT NULL,
+        FOREIGN KEY (file_id) REFERENCES csv_files (id)
+        )
+    """)
     
     conn.commit()
     conn.close()
@@ -134,7 +143,7 @@ async def upload_csv(file: UploadFile = File(...)):
 
 
 @app.get("/get-csv/{file_id}")
-async def get_csv_as_json(file_id: str, limit: Optional[int] = None):
+async def get_csv_as_json(file_id: str):
     """Get CSV data as JSON using the file ID"""
     try:
         # Connect to database
@@ -147,17 +156,21 @@ async def get_csv_as_json(file_id: str, limit: Optional[int] = None):
             conn.close()
             raise HTTPException(status_code=404, detail="File not found")
         
-        # Query to get CSV data
-        if limit is not None and limit > 0:
-            cursor.execute(
-                "SELECT row_data FROM csv_data WHERE file_id = ? ORDER BY row_index LIMIT ?", 
-                (file_id, limit)
-            )
+        # add a counter to point to which row idx we are at
+        cursor.execute("SELECT count FROM counter WHERE file_id = ?", (file_id,))
+        row = cursor.fetchone()
+        if row is None:
+            cursor.execute("INSERT INTO counter (file_id, count) VALUES (?, 0)", (file_id,))
+            conn.commit()
         else:
-            cursor.execute(
-                "SELECT row_data FROM csv_data WHERE file_id = ? ORDER BY row_index", 
-                (file_id,)
-            )
+            cursor.execute("UPDATE counter SET count = count + 1 WHERE file_id = ?", (file_id,))
+            conn.commit()
+        
+        # Query to get CSV data
+        cursor.execute(
+            "SELECT row_data FROM csv_data WHERE file_id = ? ORDER BY row_index LIMIT 1", 
+            (file_id)
+        )
         
         # Process results
         result = []
