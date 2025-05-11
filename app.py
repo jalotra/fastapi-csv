@@ -175,8 +175,8 @@ async def get_csv_as_json(file_id: str):
         
         # Query to get CSV data
         cursor.execute(
-            "SELECT row_data FROM csv_data WHERE file_id = ? ORDER BY row_index LIMIT 1", 
-            (file_id)
+            "SELECT row_data FROM csv_data WHERE file_id = ? and row_index = ?", 
+            (file_id, row[0])
         )
         
         # Process results
@@ -188,6 +188,8 @@ async def get_csv_as_json(file_id: str):
         return result
     
     except Exception as e:
+        # Log the error for debugging
+        print(f"Error retrieving CSV data: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error retrieving CSV data: {str(e)}")
 
 
