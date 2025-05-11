@@ -33,9 +33,6 @@ async def api_key_middleware(request: Request, call_next):
     return await call_next(request)
 
 
-# Add the middleware to the application
-app.add_middleware(APIKeyMiddleware)
-
 # SQLite database setup
 DATABASE_NAME = "csv_data.db"
 
